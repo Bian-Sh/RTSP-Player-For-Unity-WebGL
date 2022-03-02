@@ -14,7 +14,7 @@
 
 # 演示：
 
-![](./doc/popup.gif)
+![](./Doc/popup.gif)
 
 # 写到最后：
 
