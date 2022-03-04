@@ -1,0 +1,99 @@
+﻿<!DOCTYPE HTML>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>测试弹窗播放视频</title>
+    <link rel="stylesheet" type="text/css" href="htmlstyle.css">
+    <script type="text/javascript" src="jquery-1.6.1.min.js"></script>
+    <script type="text/javascript" src="webrtcplayer.js"></script>
+    <script type="text/javascript">
+        var opacity = 0.68;
+        var internal = 0.01;
+        var timeout = 0.5;
+        var player = null;
+
+        $(document).ready(function () {
+            WebRtcPlayer.setServer('localhost:8083');
+            player = new WebRtcPlayer('videoPlayer', 'demo');
+
+            //当视频加载完毕尺寸变更时需要将面板居中
+            var video = document.getElementById("videoPlayer");
+            video.onresize = DoPanelResize;
+
+            //浏览器窗口大小改变时
+            $(window).resize(DoPanelResize);
+            //浏览器有滚动条时的操作、
+            $(window).scroll(DoPanelResize);
+        });
+        //网页关闭事件
+        $(window).unload(function () {
+            alert("Goodbye!");
+        });
+
+        function ShowPanel() {
+            $(".panel").css({ 'display': 'block' });
+            DoPanelResize();
+            player.load("demo"); // 这个参数是 UUID，绝对不能传错，否则服务器返回 500 错误
+            ShowMask(null, true);
+        }
+
+        // 隐藏弹窗
+        function ClosePanel() {
+            $(".panel").css({ 'display': 'none' });
+            ShowMask(() => {
+                $(".mask").css({ 'display': 'none' });
+                this.player.destroy();
+            }, false);
+        }
+        // 居中
+        function DoPanelResize() {
+            if ($(".panel").css("display") != "block") return;
+            var screenWidth = $(window).width();
+            var screenHeight = $(window).height();
+            var scrolltop = $(window).scrollTop();
+            var objLeft = (screenWidth - $(".panel").width()) / 2;//当前浏览器窗口的 宽高
+            var objTop = (screenHeight - $(".panel").height()) / 2; + scrolltop;//获取当前窗口距离页面顶部高度
+            $(".panel").css({ 'left': objLeft + 'px', "top": objTop + 'px' });
+        }
+        // 实现 蒙版的渐隐渐显
+        function ShowMask(callback, isfadein) {
+            var mask = document.getElementById("mask");
+            mask.style.display = "block";
+            var op = mask.style.opacity = isfadein ? 0.00 : 1;
+            var op_temp = isfadein ? opacity : 0;
+            var delay = setInterval(() => { //开启定时器
+                if (isfadein) {
+                    if (mask.style.opacity < op_temp) {
+                        op += internal;
+                    } else {
+                        op = opacity;
+                    }
+                } else {
+                    if (mask.style.opacity > op_temp) {
+                        op -= internal;
+                    } else {
+                        op = opacity;
+                    }
+                }
+                mask.style.opacity = op;
+                if (Math.abs(mask.style.opacity - op_temp) < 0.001) {
+                    $(".closebutton").css({ 'display': isfadein ? 'block' : 'none' });
+                    if (callback) callback();
+                    clearInterval(delay); //清除定时器
+                }
+            }, timeout);
+        }
+
+    </script>
+</head>
+
+<body>
+    <div>点击以弹窗形式居中播放视频</div>
+    <input type="button" onclick="ShowPanel()" id="btn" value="播放" />
+    <div class="mask" id="mask"></div>
+    <button onclick="ClosePanel()" class="closebutton"></button>
+    <div class="panel">
+        <video id="videoPlayer" autoplay controls muted style="width:600px;"></video>
+    </div>
+</body>
+</html>

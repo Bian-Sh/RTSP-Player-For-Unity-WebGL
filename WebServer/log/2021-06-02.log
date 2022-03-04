@@ -1,0 +1,14 @@
+03:20:05 服务启动成功!
+03:21:23 GET localhost / 127.0.0.1 200
+03:21:24 GET localhost /favicon.ico 127.0.0.1 404
+03:21:25 GET localhost /uploadclass/ 127.0.0.1 200
+03:21:27 GET localhost /uploadclass/upfiletofile.htm 127.0.0.1 200
+03:25:44 POST  /uploadclass/savetofile.asp 127.0.0.1 200
+03:27:16 POST localhost /uploadclass/savetofile.asp 127.0.0.1 200
+03:33:30 POST localhost /uploadclass/savetofile.asp 127.0.0.1 200
+03:55:38 POST localhost /uploadclass/savetofile.asp 127.0.0.1 200
+03:55:42 GET localhost /favicon.ico 127.0.0.1 404
+03:56:31 POST localhost /uploadclass/savetofile.asp 127.0.0.1 200
+03:56:32 POST localhost /uploadclass/savetofile.asp 127.0.0.1 200
+04:00:04 POST localhost /uploadclass/savetofile.asp 127.0.0.1 200
+04:00:05 POST localhost /uploadclass/savetofile.asp 127.0.0.1 200

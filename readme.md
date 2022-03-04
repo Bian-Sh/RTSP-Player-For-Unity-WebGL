@@ -10,8 +10,6 @@
 
 4. 非网页前端，大佬轻拍
 
-
-
 # 演示：
 
 ![](./Doc/popup.gif)
@@ -22,7 +20,17 @@
 
 * 这个仓库使用了 [jquery](https://github.com/jquery/jquery)
 
-* 后面想做一个通过[RTSPtoWebRTC](https://github.com/deepch/RTSPtoWebRTC) 把 rtsp 直播流整到Unity webgl 的示例，所以先撸个弹窗试下
+* ~~后面想做一个通过[RTSPtoWebRTC](https://github.com/deepch/RTSPtoWebRTC) 把 rtsp 直播流整到Unity webgl 的示例，所以先撸个弹窗试下~~
+
+* 实现了弹窗播放 RTSP 视频的功能
+
+
+
+# Reference：
+
+* [vdalex25/WebRtcPlayer: example player for RTSPtoWebRTC project ](https://github.com/vdalex25/WebRtcPlayer)
+
+* [deepch/RTSPtoWeb: RTSP Stream to WebBrowser](https://github.com/deepch/RTSPtoWeb)
 
 
 
