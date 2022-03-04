@@ -22,14 +22,35 @@
     }
   },
   "streams": {
-       "demo": {
+    "Camera01": {
       "channels": {
         "0": {
           "debug": true,
+          "on_demand": true,
           "url": "rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov"
         }
       },
-      "name": "demo"
+      "name": "Camera01"
+    },
+    "Camera02": {
+      "channels": {
+        "0": {
+          "debug": true,
+          "on_demand": true,
+          "url": "rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov"
+        }
+      },
+      "name": "Camera02"
+    },
+    "Camera03": {
+      "channels": {
+        "0": {
+          "debug": true,
+          "on_demand": true,
+          "url": "rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov"
+        }
+      },
+      "name": "Camera03"
     }
   }
 }

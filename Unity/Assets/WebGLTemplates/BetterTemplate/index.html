@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+    <meta charset="utf-8">
+    <title>%UNITY_WEB_NAME%</title>
+    <style>
+        html {
+            box-sizing: border-box;
+        }
+
+        *, *:before, *:after {
+            box-sizing: inherit;
+        }
+
+        body {
+            margin: 0;
+            background: #444;
+        }
+
+        #gameContainer {
+            width: 100vw;
+            height: 100vh;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+            /* try to handle mobile dialog */
+            canvas + * {
+                z-index: 2;
+            }
+
+        .logo {
+            display: block;
+            width: max-width: 100vw;
+            height: max-height: 70vh;
+        }
+
+        .progress {
+            margin: 1.5em;
+            border: 1px solid white;
+            width: 50vw;
+            display: none;
+        }
+
+            .progress .full {
+                margin: 2px;
+                background: white;
+                height: 1em;
+                transform-origin: top left;
+            }
+
+        #loader {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .spinner,
+        .spinner:after {
+            border-radius: 50%;
+            width: 5em;
+            height: 5em;
+        }
+
+        .spinner {
+            margin: 10px;
+            font-size: 10px;
+            position: relative;
+            text-indent: -9999em;
+            border-top: 1.1em solid rgba(255, 255, 255, 0.2);
+            border-right: 1.1em solid rgba(255, 255, 255, 0.2);
+            border-bottom: 1.1em solid rgba(255, 255, 255, 0.2);
+            border-left: 1.1em solid #ffffff;
+            transform: translateZ(0);
+            animation: spinner-spin 1.1s infinite linear;
+        }
+
+        @keyframes spinner-spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        /*--------- For RTSP Player ↓-----------*/
+        .mask {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            opacity: 0;
+            display: none;
+            z-index: 99;
+        }
+
+        .closebutton {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            opacity: 0;
+            display: none;
+            z-index: 100;
+        }
+
+        .panel {
+            position: absolute;
+            display: none;
+            text-align: center;
+            z-index: 101;
+        }
+        /*--------- For RTSP Player ↑-----------*/
+
+    </style>
+</head>
+
+<body>
+    <div id="gameContainer"></div>
+    <div id="loader">
+        <img class="logo" src="logo.png">
+        <div class="spinner"></div>
+        <div class="progress"><div class="full"></div></div>
+    </div>
+    <div class="mask" id="mask"></div>
+    <button onclick="ClosePanel()" class="closebutton"></button>
+    <div class="panel">
+        <video id="videoPlayer" autoplay controls muted style="width:600px;"></video>
+    </div>
+</body>
+
+<script type="text/javascript" src="res/jquery-1.6.1.min.js"></script>
+<script type="text/javascript" src="res/webrtcplayer.js"></script>
+<script src="%UNITY_WEBGL_LOADER_URL%"></script>
+<script>
+    var gameInstance = UnityLoader.instantiate("gameContainer", "%UNITY_WEBGL_BUILD_URL%", { onProgress: UnityProgress });
+    function UnityProgress(gameInstance, progress) {
+        if (!gameInstance.Module) {
+            return;
+        }
+        const loader = document.querySelector("#loader");
+        if (!gameInstance.progress) {
+            const progress = document.querySelector("#loader .progress");
+            progress.style.display = "block";
+            gameInstance.progress = progress.querySelector(".full");
+            loader.querySelector(".spinner").style.display = "none";
+        }
+        gameInstance.progress.style.transform = `scaleX(${progress})`;
+        if (progress === 1 && !gameInstance.removeTimeout) {
+            gameInstance.removeTimeout = setTimeout(function () {
+                loader.style.display = "none";
+            }, 2000);
+        }
+    }
+
+    /*--------- For RTSP Player ↓-----------*/
+    var opacity = 0.68;
+    var internal = 0.01;
+    var timeout = 0.5;
+    var player = null;
+
+    $(document).ready(function () {
+        WebRtcPlayer.setServer('localhost:8083');
+        player = new WebRtcPlayer('videoPlayer', 'demo');
+
+        //当视频加载完毕尺寸变更时需要将面板居中
+        var video = document.getElementById("videoPlayer");
+        video.onresize = DoPanelResize;
+
+        //浏览器窗口大小改变时
+        $(window).resize(DoPanelResize);
+        //浏览器有滚动条时的操作、
+        $(window).scroll(DoPanelResize);
+    });
+    //网页关闭事件
+    $(window).unload(function () {
+        alert("Goodbye!");
+    });
+
+    function ShowPanel(uuid) {
+        $(".panel").css({ 'display': 'block' });
+        DoPanelResize();
+        player.load(uuid); // 这个参数是 UUID，绝对不能传错，否则服务器返回 500 错误
+        ShowMask(null, true);
+    }
+
+    // 隐藏弹窗
+    function ClosePanel() {
+        $(".panel").css({ 'display': 'none' });
+        ShowMask(() => {
+            $(".mask").css({ 'display': 'none' });
+            this.player.destroy();
+        }, false);
+    }
+    // 居中
+    function DoPanelResize() {
+        if ($(".panel").css("display") != "block") return;
+        var screenWidth = $(window).width();
+        var screenHeight = $(window).height();
+        var scrolltop = $(window).scrollTop();
+        var objLeft = (screenWidth - $(".panel").width()) / 2;//当前浏览器窗口的 宽高
+        var objTop = (screenHeight - $(".panel").height()) / 2; + scrolltop;//获取当前窗口距离页面顶部高度
+        $(".panel").css({ 'left': objLeft + 'px', "top": objTop + 'px' });
+    }
+    // 实现 蒙版的渐隐渐显
+    function ShowMask(callback, isfadein) {
+        var mask = document.getElementById("mask");
+        mask.style.display = "block";
+        var op = mask.style.opacity = isfadein ? 0.00 : 1;
+        var op_temp = isfadein ? opacity : 0;
+        var delay = setInterval(() => { //开启定时器
+            if (isfadein) {
+                if (mask.style.opacity < op_temp) {
+                    op += internal;
+                } else {
+                    op = opacity;
+                }
+            } else {
+                if (mask.style.opacity > op_temp) {
+                    op -= internal;
+                } else {
+                    op = opacity;
+                }
+            }
+            mask.style.opacity = op;
+            if (Math.abs(mask.style.opacity - op_temp) < 0.001) {
+                $(".closebutton").css({ 'display': isfadein ? 'block' : 'none' });
+                if (callback) callback();
+                clearInterval(delay); //清除定时器
+            }
+        }, timeout);
+    }
+
+    /*--------- For RTSP Player ↑-----------*/
+
+
+</script>
+
+</html>
+
