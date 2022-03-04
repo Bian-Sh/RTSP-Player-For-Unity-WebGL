@@ -56,6 +56,8 @@
 
 * 这个仓库使用了 [jquery](https://github.com/jquery/jquery)
 
+* 我使用的这个测试视频好像卡卡的，有条件的使用监控测试吧。
+
 # Reference：
 
 * [vdalex25/WebRtcPlayer: example player for RTSPtoWebRTC project ](https://github.com/vdalex25/WebRtcPlayer)
