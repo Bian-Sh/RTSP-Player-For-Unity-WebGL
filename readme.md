@@ -46,7 +46,7 @@
    
    c. 打开 **RTSPPlayer/index.html** 修改 ShowPanel 方法中 player.load("demo");  的 ``demo`` 字眼为你写的id 
    
-         d. 请注意，修改了 config.json ，Unity工程中的 相机绑定的相机数据需要一并修改，为方便外部修改和避免重新打包，可以将此类数据外部动态加载。
+   d. 请注意，修改了 config.json ，Unity工程中的 相机绑定的相机数据需要一并修改，为方便外部修改和避免重新打包，可以将此类数据外部动态加载。
 
 # 写到最后：
 
@@ -56,7 +56,7 @@
 
 * 这个仓库使用了 [jquery](https://github.com/jquery/jquery)
 
-* 我使用的这个测试视频好像卡卡的，有条件的使用监控测试吧。
+* 这个测试视频卡卡且 2022.6.1 就无法访问了，有条件的使用监控测试吧。
 
 # Reference：
 
