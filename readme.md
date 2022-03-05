@@ -14,7 +14,7 @@
 
 > 图中展示的控制台程序是 RTSP 推流服务器
 
-![](./Doc/rtspplayer.gif)
+![](./doc/rtspplayer.gif)
 
 # 如何使用：
 
